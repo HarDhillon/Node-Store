@@ -4,6 +4,7 @@ const app = express()
 
 const adminRoutes = require('./routes/admin')
 const shopRoutes = require('./routes/shop')
+const notFoundRoutes = require('./routes/404')
 
 // bodyParser is now part of express so we can actually just do this
 app.use(express.urlencoded({ extended: true }))
@@ -12,8 +13,6 @@ app.use(express.urlencoded({ extended: true }))
 app.use('/admin', adminRoutes)
 app.use(shopRoutes)
 
-app.use((req, res, next) => {
-    res.status(404).send('<h1>Page not found</h1>')
-})
+app.use(notFoundRoutes)
 
 app.listen(3000)
