@@ -22,7 +22,7 @@ app.use(shopRoutes)
 
 // Any other routes not matching
 app.use((req, res, next) => {
-    res.status(404).sendFile(path.join(rootDir, 'views', '404.html'))
+    res.render('404', { pageTitle: 'Page not found' })
 })
 
 app.listen(3000)
