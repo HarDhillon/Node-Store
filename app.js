@@ -2,10 +2,12 @@ const express = require('express')
 
 const path = require('path')
 const rootDir = require('./util/path')
+const expressHbs = require('express-handlebars')
 
 const app = express()
 
-app.set('view engine', 'pug');
+app.engine('hbs', expressHbs())
+app.set('view engine', 'hbs');
 app.set()
 
 const adminData = require('./routes/admin')
