@@ -10,7 +10,13 @@ const products = []
 // /admin/add-product => GET
 router.get('/add-product', (req, res, next) => {
     // next sends us to the next middleware
-    res.render('add-product', { pageTitle: 'Add product', path: '/admin/add-product' })
+    res.render('add-product', {
+        pageTitle: 'Add product',
+        path: '/admin/add-product',
+        formCss: true,
+        productCSS: true,
+        activeAddProducts: true,
+    })
 })
 
 // /admin/add-product => POST
