@@ -17,7 +17,7 @@ exports.postAddProduct = (req, res, next) => {
 }
 
 exports.getProducts = (req, res, next) => {
-    // We call fetchAll and pass it an anonymous function
+    // We call fetchAll and pass it an anonymous function - this ensures we dont run res.render until the file with our products has been read.
     Product.fetchAll(products => {
         res.render('shop', {
             prods: products,
