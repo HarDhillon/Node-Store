@@ -1,7 +1,7 @@
 const Product = require('../models/product')
 
 exports.getAddProduct = (req, res, next) => {
-    res.render('add-product', {
+    res.render('admin/add-product', {
         pageTitle: 'Add product',
         path: '/admin/add-product',
         formCss: true,
@@ -17,16 +17,11 @@ exports.postAddProduct = (req, res, next) => {
 }
 
 exports.getProducts = (req, res, next) => {
-    // We call fetchAll and pass it an anonymous function - this ensures we dont run res.render until the file with our products has been read.
     Product.fetchAll(products => {
-        res.render('shop', {
+        res.render('admin/products', {
             prods: products,
-            pageTitle: 'Shop',
-            path: "/",
-            hasProducts: products.length > 0,
-            activeShop: true,
-            productCSS: true,
+            pageTitle: 'Admin Products',
+            path: "/admin/products",
         })
     })
-
 }
