@@ -28,12 +28,11 @@
                                 </div>
                                 <div class="card__actions">
                                     <a href="/products/<%= product.id %>" class="btn">Details</a>
-                                    <form action="/add-to-cart" method="POST">
-                                        <button class="btn">Add to Cart</button>
-                                    </form>
+                                    <!--* Includes wont get the product in the loop, you have to explicity set it -->
+                                    <%- include('../includes/add-to-cart.ejs', {product: product}) %>
                                 </div>
                             </article>
-                            <% } %>
+                        <% } %>
                     </div>
                     <% } else { %>
                         <h1>No Products Found!</h1>
