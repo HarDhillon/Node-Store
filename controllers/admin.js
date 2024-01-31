@@ -4,6 +4,7 @@ exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
         pageTitle: 'Add product',
         path: '/admin/add-product',
+        editing: null,
     })
 }
 
