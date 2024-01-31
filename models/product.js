@@ -61,4 +61,20 @@ module.exports = class Product {
             cb(product)
         })
     }
+
+    static deleteProduct(id) {
+        const p = path.join(path.dirname(require.main.filename), 'data', 'products.json');
+
+        getProductsFromFile(products => {
+            const productIndex = products.findIndex(prod => prod.id === id)
+
+            const updatedProducts = [...products]
+            updatedProducts.splice(productIndex, 1)
+
+            fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
+                console.log(err)
+            })
+        })
+
+    }
 }
