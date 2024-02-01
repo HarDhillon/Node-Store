@@ -57,10 +57,10 @@ exports.postEditProduct = (req, res, next) => {
 }
 
 exports.postDeleteProduct = (req, res, next) => {
-    const prodId = req.params.productId
-    Product.deleteProduct(prodId)
+    const prodId = req.body.productId
+    Product.deleteById(prodId)
 
-    res.redirect('/')
+    res.redirect('/admin/products')
 }
 
 exports.getProducts = (req, res, next) => {
