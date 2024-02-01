@@ -37,10 +37,28 @@ exports.getIndex = (req, res, next) => {
 }
 
 exports.getCart = (req, res, next) => {
-    res.render('shop/cart', {
-        path: '/cart',
-        pageTitle: 'Your Cart'
-    });
+    Cart.getCart(cart => {
+        // We want all the information about the product that is in the cart, so we check the product model as well
+        Product.fetchAll(products => {
+            const cartProducts = []
+
+            for (product of products) {
+                // Get the data of the product from cart (to get quantity)
+                const cartProductData = cart.products.find(prod => prod.id === product.id)
+                // check what products are in the cart
+                if (cart.products.find(prod => prod.id === product.id)) {
+                    cartProducts.push({ productData: product, qty: cartProductData.qty })
+                }
+            }
+            res.render('shop/cart', {
+                path: '/cart',
+                pageTitle: 'Your Cart',
+                products: cartProducts
+            });
+        })
+
+    })
+
 };
 
 exports.postCart = (req, res, next) => {
