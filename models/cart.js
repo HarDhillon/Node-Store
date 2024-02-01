@@ -48,6 +48,10 @@ module.exports = class Cart {
             }
             const updatedCart = { ...JSON.parse(fileContent) };
             const product = updatedCart.products.find(prod => prod.id === id)
+            // When product is deleted that is not in cart, product wont be found in cart. This will throw error so return if product doesnt exist
+            if (!product) {
+                return
+            }
             const productQty = product.qty;
             // Remove items from cart
             updatedCart.products = updatedCart.products.filter(prod => prod.id !== id)
