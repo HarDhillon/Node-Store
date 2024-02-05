@@ -16,7 +16,10 @@ exports.postAddProduct = (req, res, next) => {
 
     const product = new Product(null, title, imageUrl, description, price)
     product.save()
-    res.redirect('/')
+        .then(() => {
+            res.redirect('/')
+        })
+        .catch(err => console.log(err))
 }
 
 exports.getEditProduct = (req, res, next) => {
@@ -64,11 +67,13 @@ exports.postDeleteProduct = (req, res, next) => {
 }
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll(products => {
-        res.render('admin/products', {
-            prods: products,
-            pageTitle: 'Admin Products',
-            path: "/admin/products",
+    Product.fetchAll()
+        .then(([rows, fieldData]) => {
+            res.render('admin/products', {
+                prods: rows,
+                pageTitle: 'Admin Products',
+                path: "/admin/products",
+            })
         })
-    })
+        .catch()
 }

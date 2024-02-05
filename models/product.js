@@ -11,7 +11,9 @@ module.exports = class Product {
     }
 
     save() {
-
+        return db.execute(
+            'INSERT INTO products (title, price, imageUrl, description) VALUES (?, ?, ?, ?)',
+            [this.title, this.price, this.imageUrl, this.description])
     }
 
     // static methods get called on an a class object not an object. So you call it as Product.method
