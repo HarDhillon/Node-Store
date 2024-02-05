@@ -9,7 +9,7 @@ const errorController = require('./controllers/error');
 
 // bodyParser is now part of express so we can actually just do this
 app.use(express.urlencoded({ extended: true }))
-
+// Determine where static files will come from
 app.use(express.static(path.join(rootDir, 'public')))
 
 // putting a /argument here will only run if the url is /admin/*something*

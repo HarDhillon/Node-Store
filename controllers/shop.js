@@ -2,14 +2,15 @@ const Product = require('../models/product')
 const Cart = require('../models/cart')
 
 exports.getProducts = (req, res, next) => {
-    // We call fetchAll and pass it an anonymous function - this ensures we dont run res.render until the file with our products has been read.
-    Product.fetchAll(products => {
-        res.render('shop/product-list', {
-            prods: products,
-            pageTitle: 'Shop',
-            path: "/products",
+    Product.fetchAll()
+        .then(([rows, fieldData]) => {
+            res.render('shop/product-list', {
+                prods: rows,
+                pageTitle: 'Shop',
+                path: "/products",
+            })
         })
-    })
+        .catch(err => console.log(err))
 }
 
 exports.getProduct = (req, res, next) => {
