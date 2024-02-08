@@ -2,11 +2,14 @@ const express = require('express')
 const path = require('path')
 const rootDir = require('./util/path')
 const app = express()
-app.set('view engine', 'ejs');
+
 const adminRoutes = require('./routes/admin')
 const shopRoutes = require('./routes/shop');
 const errorController = require('./controllers/error');
 
+const sequelize = require('./util/database')
+
+app.set('view engine', 'ejs');
 // bodyParser is now part of express so we can actually just do this
 app.use(express.urlencoded({ extended: true }))
 // Determine where static files will come from
@@ -18,5 +21,11 @@ app.use(shopRoutes)
 
 // Any other routes not matching
 app.use(errorController.get404)
+
+sequelize.sync().then(result => {
+    // console.log(result)
+}).catch(err => {
+    console.log(err)
+})
 
 app.listen(3000)
