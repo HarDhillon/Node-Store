@@ -13,12 +13,12 @@ exports.postAddProduct = (req, res, next) => {
     const imageUrl = req.body.imageUrl
     const price = req.body.price
     const description = req.body.description
-
-    Product.create({
+    // Because of our associations we can create a product linked to this user through this method
+    req.user.createProduct({
         title,
         imageUrl,
         price,
-        description
+        description,
     })
         .then(result => {
             console.log("Product Created")
@@ -35,10 +35,13 @@ exports.getEditProduct = (req, res, next) => {
     if (!editMode) {
         res.redirect('/')
     }
-
     const prodId = req.params.productId
-    Product.findByPk(prodId)
-        .then(product => {
+
+    // Fetch only products related to the user
+    req.user
+        .getProducts({ where: { id: prodId } })
+        .then(products => {
+            const product = products[0]
             res.render('admin/edit-product', {
                 pageTitle: 'Edit product',
                 path: '/admin/edit-product',
@@ -88,10 +91,11 @@ exports.postDeleteProduct = (req, res, next) => {
 }
 
 exports.getProducts = (req, res, next) => {
-    Product.findAll()
-        .then((product) => {
+    // Show only products that belong to the user
+    req.user.getProducts()
+        .then((products) => {
             res.render('admin/products', {
-                prods: product,
+                prods: products,
                 pageTitle: 'Admin Products',
                 path: "/admin/products",
             })

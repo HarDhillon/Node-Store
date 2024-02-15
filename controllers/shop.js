@@ -1,6 +1,5 @@
 const Product = require('../models/product')
 const Cart = require('../models/cart');
-const { where } = require('sequelize');
 
 exports.getProducts = (req, res, next) => {
     Product.findAll()
@@ -22,16 +21,6 @@ exports.getProducts = (req, res, next) => {
 exports.getProduct = (req, res, next) => {
     const prodId = req.params.productId
 
-    // * We could also findAll with where
-    // Product.findAll({ where: { id: prodId } })
-    //     .then(products => {
-    //         res.render('shop/product-detail', {
-    //             product: products[0],
-    //             pageTitle: products[0].title,
-    //             path: '/products'
-    //         })
-    //     })
-    //     .catch(err => console.log(err))
     Product.findByPk(prodId)
         .then(product => {
             res.render('shop/product-detail', {
@@ -61,36 +50,58 @@ exports.getIndex = (req, res, next) => {
 }
 
 exports.getCart = (req, res, next) => {
-    Cart.getCart(cart => {
-        // We want all the information about the product that is in the cart, so we check the product model as well
-        Product.fetchAll(products => {
-            const cartProducts = []
 
-            for (product of products) {
-                // Get the data of the product from cart (to get quantity)
-                const cartProductData = cart.products.find(prod => prod.id === product.id)
-                // check what products are in the cart
-                if (cart.products.find(prod => prod.id === product.id)) {
-                    cartProducts.push({ productData: product, qty: cartProductData.qty })
-                }
-            }
+    req.user.getCart()
+        .then(cart => {
+            return cart.getProducts()
+        })
+        .then(products => {
             res.render('shop/cart', {
                 path: '/cart',
                 pageTitle: 'Your Cart',
-                products: cartProducts
+                products: products
             });
         })
-
-    })
+        .catch(err => console.log(err))
 
 };
 
 exports.postCart = (req, res, next) => {
     const prodId = req.body.productId
-    Product.findById(prodId, (product) => {
-        Cart.addProduct(prodId, product.price)
-    })
-    res.redirect('/cart')
+    let fetchedCart
+    let newQuantity = 1
+
+    req.user.getCart()
+        // Check if product alread exists in cart
+        .then(cart => {
+            fetchedCart = cart
+            return cart.getProducts({ where: { id: prodId } })
+        })
+        .then(products => {
+            let product
+            if (products.length > 0) {
+                product = products[0]
+            }
+
+            // * If existing product update quantity based on old quantity
+            if (product) {
+                const oldQuantity = product.cartItem.quantity
+                newQuantity = oldQuantity + 1;
+                return product
+            }
+            // * Return existing product we found above or find the product to be added by Id
+            return Product.findByPk(prodId)
+        })
+        .then(product => {
+            return fetchedCart.addProduct(product, {
+                // ? Sequelize will update through CartItem BUT we also need to let it know the quantity not just the ID
+                through: { quantity: newQuantity }
+            })
+        })
+        .then(() => {
+            res.redirect('/cart')
+        })
+        .catch(err => console.log(err))
 }
 
 exports.postCartDeleteProduct = (req, res, next) => {
