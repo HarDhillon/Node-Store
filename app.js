@@ -12,6 +12,8 @@ const Product = require('./models/product')
 const User = require('./models/user')
 const Cart = require('./models/cart')
 const CartItem = require('./models/cart-item')
+const Order = require('./models/order')
+const OrderItem = require('./models/order-item')
 
 app.set('view engine', 'ejs');
 // bodyParser is now part of express so we can actually just do this
@@ -43,6 +45,10 @@ Cart.belongsTo(User)
 // * We need to tell sequelize how they are connected
 Cart.belongsToMany(Product, { through: CartItem })
 Product.belongsToMany(Cart, { through: CartItem })
+Order.belongsTo(User)
+User.hasMany(Order)
+Order.belongsToMany(Product, { through: OrderItem })
+Product.belongsToMany(Order, { through: OrderItem })
 
 sequelize.
     // ! force:true will overide database
