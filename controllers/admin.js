@@ -86,15 +86,16 @@ exports.postAddProduct = (req, res, next) => {
 //         .catch(err => console.log(err))
 // }
 
-// exports.getProducts = (req, res, next) => {
-//     // Show only products that belong to the user
-//     req.user.getProducts()
-//         .then((products) => {
-//             res.render('admin/products', {
-//                 prods: products,
-//                 pageTitle: 'Admin Products',
-//                 path: "/admin/products",
-//             })
-//         })
-//         .catch()
-// }
+exports.getProducts = (req, res, next) => {
+    // Show only products that belong to the user
+    Product.fetchAll()
+        .then(products => {
+            res.render('admin/products', {
+                prods: products,
+                pageTitle: 'Admin Products',
+                path: "/admin/products",
+            })
+        })
+        .catch(err => console.log(err))
+
+}
