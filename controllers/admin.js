@@ -14,7 +14,7 @@ exports.postAddProduct = (req, res, next) => {
     const price = req.body.price
     const description = req.body.description
     // Because of our associations we can create a product linked to this user through this method
-    const product = new Product(title, price, description, imageUrl)
+    const product = new Product(title, price, description, imageUrl, null, req.user._id)
     product.save()
         .then(result => {
             console.log("Product Created")
