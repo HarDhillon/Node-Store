@@ -13,7 +13,7 @@ router.get('/products', shopController.getProducts)
 // a : indicates a dynamic url. Dynamic url will need to go BELOW specific segments e.g /products/delete
 router.get('/products/:productId', shopController.getProduct)
 
-// router.get('/cart', shopController.getCart)
+router.get('/cart', shopController.getCart)
 
 router.post('/cart', shopController.postCart)
 

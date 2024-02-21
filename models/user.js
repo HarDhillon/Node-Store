@@ -49,6 +49,30 @@ class User {
             { $set: { cart: updatedCart } })
     }
 
+    getCart() {
+        const db = getDb()
+
+        // fetch all product id's in user collection
+        const productIds = this.cart.items.map(i => {
+            return i.productId
+        })
+        // find all elements in products where _id is in the array (returns cursor)
+        return db.collection('products')
+            .find({ _id: { $in: productIds } })
+            .toArray()
+            .then(products => {
+                return products.map(p => {
+                    // return the product details and add quantity by matching the id to user cart items where quantity is stored
+                    return {
+                        // ? find that product in user document
+                        ...p, quantity: this.cart.items.find(i => {
+                            return i.productId.toString() === p._id.toString()
+                        }).quantity
+                    }
+                })
+            })
+    }
+
     static findById(userId) {
         const db = getDb()
 
