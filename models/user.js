@@ -73,6 +73,21 @@ class User {
             })
     }
 
+    deleteItemFromCart(prodId) {
+        const db = getDb()
+
+        // Return array without the deleted item
+        const updatedCartItems = this.cart.items.filter(item => {
+            return item.productId.toString() !== prodId.toString()
+        })
+
+        return db.collection('users').updateOne(
+            { _id: new mongodb.ObjectId(this._id) },
+            { $set: { cart: { items: updatedCartItems } } }
+        )
+
+    }
+
     static findById(userId) {
         const db = getDb()
 
