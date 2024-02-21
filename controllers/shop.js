@@ -67,40 +67,50 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
     const prodId = req.body.productId
-    let fetchedCart
-    let newQuantity = 1
 
-    req.user.getCart()
-        // Check if product alread exists in cart
-        .then(cart => {
-            fetchedCart = cart
-            return cart.getProducts({ where: { id: prodId } })
-        })
-        .then(products => {
-            let product
-            if (products.length > 0) {
-                product = products[0]
-            }
-
-            // * If existing product update quantity based on old quantity
-            if (product) {
-                const oldQuantity = product.cartItem.quantity
-                newQuantity = oldQuantity + 1;
-                return product
-            }
-            // * Return existing product we found above or find the product to be added by Id
-            return Product.findByPk(prodId)
-        })
+    Product.findById(prodId)
         .then(product => {
-            return fetchedCart.addProduct(product, {
-                // ? Sequelize will update through CartItem BUT we also need to let it know the quantity not just the ID
-                through: { quantity: newQuantity }
-            })
+            return req.user.addToCart(product)
         })
-        .then(() => {
-            res.redirect('/cart')
+        .then(result => {
+            console.log(result)
         })
         .catch(err => console.log(err))
+
+    // let fetchedCart
+    // let newQuantity = 1
+
+    // req.user.getCart()
+    //     // Check if product alread exists in cart
+    //     .then(cart => {
+    //         fetchedCart = cart
+    //         return cart.getProducts({ where: { id: prodId } })
+    //     })
+    //     .then(products => {
+    //         let product
+    //         if (products.length > 0) {
+    //             product = products[0]
+    //         }
+
+    //         // * If existing product update quantity based on old quantity
+    //         if (product) {
+    //             const oldQuantity = product.cartItem.quantity
+    //             newQuantity = oldQuantity + 1;
+    //             return product
+    //         }
+    //         // * Return existing product we found above or find the product to be added by Id
+    //         return Product.findByPk(prodId)
+    //     })
+    //     .then(product => {
+    //         return fetchedCart.addProduct(product, {
+    //             // ? Sequelize will update through CartItem BUT we also need to let it know the quantity not just the ID
+    //             through: { quantity: newQuantity }
+    //         })
+    //     })
+    //     .then(() => {
+    //         res.redirect('/cart')
+    //     })
+    //     .catch(err => console.log(err))
 }
 
 exports.postCartDeleteProduct = (req, res, next) => {

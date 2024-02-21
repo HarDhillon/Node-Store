@@ -18,11 +18,10 @@ app.use(express.urlencoded({ extended: true }))
 //? Determine where static files will come from
 app.use(express.static(path.join(rootDir, 'public')))
 
-// Store our sequelize object in our request.
 app.use((req, res, next) => {
     User.findById("65d490a9897b1b4c8d6695b5")
         .then(user => {
-            req.user = user
+            req.user = new User(user.name, user.email, user.cart, user._id)
             next()
         })
         .catch(err => console.log(err))
