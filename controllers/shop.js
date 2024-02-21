@@ -121,35 +121,14 @@ exports.postCartDeleteProduct = (req, res, next) => {
 }
 
 exports.postOrder = (req, res, next) => {
-    let fetchedCart;
-    req.user.getCart()
-        .then(cart => {
-            fetchedCart = cart
-            return cart.getProducts()
-        })
-        .then(products => {
-            return req.user.createOrder()
-                .then(order => {
-                    return order.addProducts(products.map(product => {
-                        // We need to set orderItem quantity
-                        product.orderItem = { quantity: product.cartItem.quantity }
-                        return product
-                    }))
-                })
-                .catch(err => console.log(err))
-        })
-        .then(result => {
-            fetchedCart.setProducts(null)
-        })
+    req.user.addOrder()
         .then(result => {
             res.redirect('/orders')
         })
-        .catch(err => console.log(err))
 }
 
 exports.getOrders = (req, res, next) => {
-    // * We need to tell sequelize to ALSO get products associated with the order. Otherwise we just get the order table.
-    req.user.getOrders({ include: ['products'] })
+    req.user.getOrders()
         .then(orders => {
             res.render('shop/orders', {
                 path: '/orders',

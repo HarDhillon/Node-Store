@@ -88,6 +88,41 @@ class User {
 
     }
 
+    addOrder() {
+        const db = getDb();
+        // Reuse getCart to get enriched product information rather than just their id
+        return this.getCart()
+            .then(produts => {
+                const order = {
+                    items: produts,
+                    user: {
+                        _id: new mongodb.ObjectId(this._id),
+                        name: this.name,
+                        email: this.email
+                    }
+                }
+                return db.collection('orders').insertOne(order)
+            })
+            // Once successfully inserted order, update cart
+            .then(result => {
+                // update local User cart to empty
+                this.cart = { items: [] }
+
+                // Update cart in database to empty
+                return db.collection('users').updateOne(
+                    { _id: new mongodb.ObjectId(this._id) },
+                    { $set: { cart: { items: [] } } }
+                )
+            })
+            .catch(err => console.log())
+    }
+
+    getOrders() {
+        const db = getDb()
+
+        return db.collection('orders').find({ "user._id": new mongodb.ObjectId(this._id) }).toArray()
+    }
+
     static findById(userId) {
         const db = getDb()
 
