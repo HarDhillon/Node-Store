@@ -86,7 +86,11 @@ exports.postDeleteProduct = (req, res, next) => {
 exports.getProducts = (req, res, next) => {
     // Show only products that belong to the user
     Product.find()
+        // * Populate can fetch related data. Rather than just giving the user id you can fetch ALL user data. 
+        // * This is thanks to our ref: in our models
+        .populate('userId')
         .then(products => {
+            console.log(products)
             res.render('admin/products', {
                 prods: products,
                 pageTitle: 'Admin Products',
