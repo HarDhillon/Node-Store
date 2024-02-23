@@ -1,8 +1,4 @@
-// const mongodb = require('mongodb')
-// const getDb = require("../util/database").getDb
-
 const mongoose = require('mongoose')
-
 const Schema = mongoose.Schema
 
 const userSchema = new Schema({
@@ -21,7 +17,12 @@ const userSchema = new Schema({
                 quantity: { type: Number, required: true }
             }
         ]
-    }
+    },
+    orders: [
+        {
+            orderId: { type: Schema.Types.ObjectId, required: true, ref: 'Order' }
+        }
+    ]
 })
 
 userSchema.methods.addToCart = function (product) {
@@ -58,6 +59,11 @@ userSchema.methods.removeFromCart = function (productId) {
     })
 
     this.cart.items = updatedCartItems
+    return this.save()
+}
+
+userSchema.methods.clearCart = function () {
+    this.cart = { items: [] }
     return this.save()
 }
 
