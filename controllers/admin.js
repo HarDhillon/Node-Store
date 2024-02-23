@@ -14,7 +14,13 @@ exports.postAddProduct = (req, res, next) => {
     const price = req.body.price
     const description = req.body.description
     // Because of our associations we can create a product linked to this user through this method
-    const product = new Product(title, price, description, imageUrl, null, req.user._id)
+    const product = new Product({
+        title: title,
+        price: price,
+        description: description,
+        imageUrl: imageUrl,
+        userId: req.user._id
+    })
     product.save()
         .then(result => {
             console.log("Product Created")
@@ -48,26 +54,28 @@ exports.getEditProduct = (req, res, next) => {
 }
 
 exports.postEditProduct = (req, res, next) => {
-    const prodId = req.body.productId
-    const updatedTitle = req.body.title
-    const updatedPrice = req.body.price
-    const updatedImageUrl = req.body.imageUrl
-    const updatedDescription = req.body.description
+    const { productId, title, imageUrl, price, description } = req.body;
 
-    const product = new Product(updatedTitle, updatedPrice, updatedDescription, updatedImageUrl, prodId)
+    Product.findById(productId)
+        .then(product => {
+            product.title = title
+            product.imageUrl = imageUrl
+            product.price = price
+            product.description = description
 
-    product.save()
+            return product.save()
+
+        })
         .then(result => {
             console.log("Product Updated")
             res.redirect('/admin/products')
         })
         .catch(err => console.log(err))
-
 }
 
 exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId
-    Product.deleteById(prodId)
+    Product.findByIdAndDelete(prodId)
         .then(result => {
             console.log("Removed product")
             res.redirect('/admin/products')
@@ -77,7 +85,7 @@ exports.postDeleteProduct = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
     // Show only products that belong to the user
-    Product.fetchAll()
+    Product.find()
         .then(products => {
             res.render('admin/products', {
                 prods: products,
