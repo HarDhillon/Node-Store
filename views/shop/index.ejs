@@ -22,8 +22,8 @@
                             <p class="product__description"><%= product.description %></p>
                         </div>
                         <div class="card__actions">
-                           <!--* Includes wont get the product in the loop, you have to explicity set it -->
-                           <%- include('../includes/add-to-cart.ejs', {product: product}) %>
+                                <a href="/products/<%= product._id %>" class="btn">Details</a>
+                            <%- include('../includes/add-to-cart.ejs', {product: product}) %>
                         </div>
                     </article>
                 <% } %>

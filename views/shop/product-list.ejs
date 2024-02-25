@@ -19,8 +19,8 @@
                                     <img src="<%= product.imageUrl %>" alt="<%= product.title %>">
                                 </div>
                                 <div class="card__content">
-                                    <h2 class="product__price">
-                                        $<%= product.price %>
+                                    <h2 class="product__price">$
+                                        <%= product.price %>
                                     </h2>
                                     <p class="product__description">
                                         <%= product.description %>
@@ -28,11 +28,10 @@
                                 </div>
                                 <div class="card__actions">
                                     <a href="/products/<%= product._id %>" class="btn">Details</a>
-                                    <!--* Includes wont get the product in the loop, you have to explicity set it -->
                                     <%- include('../includes/add-to-cart.ejs', {product: product}) %>
                                 </div>
                             </article>
-                        <% } %>
+                            <% } %>
                     </div>
                     <% } else { %>
                         <h1>No Products Found!</h1>
