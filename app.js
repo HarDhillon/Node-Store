@@ -10,6 +10,7 @@ const app = express()
 
 const adminRoutes = require('./routes/admin')
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 
 const errorController = require('./controllers/error');
 
@@ -34,6 +35,7 @@ app.use((req, res, next) => {
 // putting a /argument here will only run if the url is /admin/*something*
 app.use('/admin', adminRoutes)
 app.use(shopRoutes)
+app.use(authRoutes)
 
 // Any other routes not matching
 app.use(errorController.get404)
