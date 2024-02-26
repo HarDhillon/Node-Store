@@ -66,20 +66,6 @@ app.use(errorController.get404)
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(result => {
-        // findOne() returns first user if no args given
-        User.findOne()
-            .then(user => {
-                if (!user) {
-                    const user = new User({
-                        name: 'Har',
-                        email: 'test@email.com',
-                        cart: {
-                            items: []
-                        }
-                    })
-                    user.save()
-                }
-            })
         app.listen(3000)
         console.log('Connected!')
 
