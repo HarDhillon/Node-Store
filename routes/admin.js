@@ -1,21 +1,21 @@
 const express = require('express')
 const adminController = require('../controllers/admin')
+const isAuth = require('../middleware/is-auth')
 const router = express.Router()
 
 // * Routes here will start with /admin
 
-//  GET
-router.get('/add-product', adminController.getAddProduct)
+// * Addming more middleware, request will go through from left to right
+router.get('/add-product', isAuth, adminController.getAddProduct)
 
-// POST
-router.post('/add-product', adminController.postAddProduct)
+router.post('/add-product', isAuth, adminController.postAddProduct)
 
-router.get('/products', adminController.getProducts)
+router.get('/products', isAuth, adminController.getProducts)
 
-router.get('/edit-product/:productId', adminController.getEditProduct)
+router.get('/edit-product/:productId', isAuth, adminController.getEditProduct)
 
-router.post('/edit-product', adminController.postEditProduct)
+router.post('/edit-product', isAuth, adminController.postEditProduct)
 
-router.post('/delete-product', adminController.postDeleteProduct)
+router.post('/delete-product', isAuth, adminController.postDeleteProduct)
 
 module.exports = router
