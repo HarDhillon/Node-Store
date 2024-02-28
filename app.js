@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
 const csrf = require('csurf')
+const flash = require('connect-flash')
 
 const path = require('path')
 const rootDir = require('./util/path')
@@ -56,6 +57,9 @@ app.use(
 // CSURF
 const csrfProtection = csrf()
 app.use(csrfProtection)
+
+// Flash
+app.use(flash())
 
 // * We need to create a mongoose model of our user
 // * The user stored in the session is JUST an object NOT mongoose model

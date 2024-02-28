@@ -3,18 +3,36 @@ const bcrypt = require('bcryptjs')
 const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
+
+  // flash('error') will return empty array if no message inside
+  let message = req.flash('error')
+  if (message.length > 0) {
+    message = message[0]
+  } else {
+    message = null
+  }
+
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
     isAuthenticated: false,
+    errorMessage: message
   });
 };
 
 exports.getSignup = (req, res, next) => {
+
+  let message = req.flash('error')
+  if (message.length > 0) {
+    message = message[0]
+  } else {
+    message = null
+  }
   res.render('auth/signup', {
     path: '/signup',
     pageTitle: 'Signup',
-    isAuthenticated: false
+    isAuthenticated: false,
+    errorMessage: message
   });
 };
 
@@ -26,6 +44,8 @@ exports.postLogin = (req, res, next) => {
     .then(user => {
       // If user email doesnt exist return to login page
       if (!user) {
+        // flash sets a temporary key value in our sesssion
+        req.flash('error', 'Invalid Email or Password')
         return res.redirect('/login')
       }
       bcrypt.compare(password, user.password)
@@ -38,7 +58,8 @@ exports.postLogin = (req, res, next) => {
               res.redirect('/');
             });
           }
-          // If doMatch is false then:
+          // If doMatch is false then passwords dont match:
+          req.flash('error', 'Invalid Email or Password')
           res.redirect('/login')
         })
         .catch(err => {
@@ -58,6 +79,7 @@ exports.postSignup = (req, res, next) => {
     .then(userDoc => {
 
       if (userDoc) {
+        req.flash('error', 'Email already in use')
         return res.redirect('/signup')
       }
 
