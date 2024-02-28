@@ -1,7 +1,17 @@
 const bcrypt = require('bcryptjs')
+const nodemailer = require('nodemailer')
 
 const User = require('../models/user');
 
+// Transport for nodemailer sends to our mailtrap test inbox
+var transport = nodemailer.createTransport({
+  host: "sandbox.smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: process.env.MAILTRAP_USER,
+    pass: process.env.MAILTRAP_PASS
+  }
+});
 exports.getLogin = (req, res, next) => {
 
   // flash('error') will return empty array if no message inside
@@ -94,8 +104,18 @@ exports.postSignup = (req, res, next) => {
         })
         .then(result => {
           res.redirect('/login')
-        })
 
+          return transport.sendMail({
+            to: email,
+            from: 'shop@demomailtrap.com',
+            subject: 'Signup Success',
+            html: '<h1>You have signed up</h1>'
+          })
+
+        })
+        .catch(err => {
+          console.log(err)
+        })
     })
     .catch(err => console.log(err))
 };
