@@ -62,7 +62,7 @@ app.use(csrfProtection)
 app.use(flash())
 
 // * We need to create a mongoose model of our user
-// * The user stored in the session is JUST an object NOT mongoose model
+// * The user stored in the session during login is JUST an object NOT mongoose model
 app.use((req, res, next) => {
     if (!req.session.user) {
         return next()

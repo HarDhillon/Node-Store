@@ -35,13 +35,16 @@ exports.getEditProduct = (req, res, next) => {
     // Fetch query param
     const editMode = req.query.edit;
     if (!editMode) {
-        res.redirect('/')
+        return res.redirect('/')
     }
     const prodId = req.params.productId
 
     // Fetch only products related to the user
     Product.findById(prodId)
         .then(product => {
+            if (product.userId.toString() !== req.user._id.toString()) {
+                return res.redirect('/')
+            }
             res.render('admin/edit-product', {
                 pageTitle: 'Edit product',
                 path: '/admin/edit-product',
@@ -58,24 +61,26 @@ exports.postEditProduct = (req, res, next) => {
 
     Product.findById(productId)
         .then(product => {
+            if (product.userId.toString() !== req.user._id.toString()) {
+                return res.redirect('/')
+            }
             product.title = title
             product.imageUrl = imageUrl
             product.price = price
             product.description = description
 
             return product.save()
-
-        })
-        .then(result => {
-            console.log("Product Updated")
-            res.redirect('/admin/products')
+                .then(result => {
+                    console.log("Product Updated")
+                    res.redirect('/admin/products')
+                })
         })
         .catch(err => console.log(err))
 }
 
 exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId
-    Product.findByIdAndDelete(prodId)
+    Product.deleteOne({ _id: prodId, userId: req.user._id })
         .then(result => {
             console.log("Removed product")
             res.redirect('/admin/products')
@@ -85,12 +90,11 @@ exports.postDeleteProduct = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
     // Show only products that belong to the user
-    Product.find()
+    Product.find({ userId: req.user._id })
         // * Populate can fetch related data. Rather than just giving the user id you can fetch ALL user data. 
         // * This is thanks to our ref: in our models
         .populate('userId')
         .then(products => {
-            console.log(products)
             res.render('admin/products', {
                 prods: products,
                 pageTitle: 'Admin Products',
