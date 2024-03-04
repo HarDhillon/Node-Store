@@ -29,7 +29,10 @@ exports.getLogin = (req, res, next) => {
     path: '/login',
     pageTitle: 'Login',
     isAuthenticated: false,
-    errorMessage: message
+    errorMessage: message,
+    oldInput: {
+      email: ""
+    }
   });
 };
 
@@ -61,7 +64,10 @@ exports.postLogin = (req, res, next) => {
         path: '/login',
         pageTitle: 'Login',
         isAuthenticated: false,
-        errorMessage: errors.array()[0].msg
+        errorMessage: errors.array()[0].msg,
+        oldInput: {
+          email: req.body.email
+        }
       });
   }
   // If no errors isLoggedIn will be saved as true in session
