@@ -1,10 +1,15 @@
 const Product = require('../models/product')
 
+const { validationResult } = require('express-validator')
+
 exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
         pageTitle: 'Add product',
         path: '/admin/add-product',
         editing: null,
+        hasError: false,
+        errorMessage: null,
+        validationErrors: []
     })
 }
 
@@ -13,7 +18,25 @@ exports.postAddProduct = (req, res, next) => {
     const imageUrl = req.body.imageUrl
     const price = req.body.price
     const description = req.body.description
-    // Because of our associations we can create a product linked to this user through this method
+    const errors = validationResult(req)
+
+    if (!errors.isEmpty()) {
+        return res.status(422).render('admin/edit-product', {
+            pageTitle: 'Add product',
+            path: '/admin/edit-product',
+            editing: false,
+            hasError: true,
+            product: {
+                title,
+                imageUrl,
+                price,
+                description
+            },
+            errorMessage: errors.array()[0].msg,
+            validationErrors: errors.array()
+        })
+    }
+
     const product = new Product({
         title: title,
         price: price,
@@ -50,6 +73,9 @@ exports.getEditProduct = (req, res, next) => {
                 path: '/admin/edit-product',
                 editing: editMode,
                 product: product,
+                hasError: false,
+                errorMessage: null,
+                validationErrors: []
             })
         })
         .catch(err => console.log(err))
@@ -58,6 +84,27 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
     const { productId, title, imageUrl, price, description } = req.body;
+
+    const errors = validationResult(req)
+
+    if (!errors.isEmpty()) {
+        console.log(errors.array())
+        return res.status(422).render('admin/edit-product', {
+            pageTitle: 'Edit product',
+            path: '/admin/edit-product',
+            editing: true,
+            hasError: true,
+            product: {
+                title,
+                imageUrl,
+                price,
+                description,
+                _id: productId
+            },
+            errorMessage: errors.array()[0].msg,
+            validationErrors: errors.array()
+        })
+    }
 
     Product.findById(productId)
         .then(product => {
