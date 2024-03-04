@@ -2,6 +2,8 @@ const bcrypt = require('bcryptjs')
 const nodemailer = require('nodemailer')
 const crypto = require('crypto')
 
+const { validationResult } = require("express-validator");
+
 const User = require('../models/user');
 
 // Transport for nodemailer sends to our mailtrap test inbox
@@ -84,41 +86,41 @@ exports.postLogin = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
   const email = req.body.email
   const password = req.body.password
-  const confirmPassword = req.body.confirmPassword
+  const errors = validationResult(req)
 
-  User.findOne({ email: email })
-    .then(userDoc => {
+  if (!errors.isEmpty()) {
+    return res.status(422)
+      .render('auth/signup', {
+        path: '/signup',
+        pageTitle: 'Signup',
+        isAuthenticated: false,
+        errorMessage: errors.array()[0].msg
+      });
+  }
 
-      if (userDoc) {
-        req.flash('error', 'Email already in use')
-        return res.redirect('/signup')
-      }
-
-      return bcrypt.hash(password, 12)
-        .then(hashedPassword => {
-          const user = new User({
-            email: email,
-            password: hashedPassword,
-            cart: { items: [] }
-          })
-          return user.save()
-        })
-        .then(result => {
-          res.redirect('/login')
-
-          return transport.sendMail({
-            to: email,
-            from: 'shop@demomailtrap.com',
-            subject: 'Signup Success',
-            html: '<h1>You have signed up</h1>'
-          })
-
-        })
-        .catch(err => {
-          console.log(err)
-        })
+  bcrypt.hash(password, 12)
+    .then(hashedPassword => {
+      const user = new User({
+        email: email,
+        password: hashedPassword,
+        cart: { items: [] }
+      })
+      return user.save()
     })
-    .catch(err => console.log(err))
+    .then(result => {
+      res.redirect('/login')
+
+      return transport.sendMail({
+        to: email,
+        from: 'shop@demomailtrap.com',
+        subject: 'Signup Success',
+        html: '<h1>You have signed up</h1>'
+      })
+
+    })
+    .catch(err => {
+      console.log(err)
+    })
 };
 
 exports.postLogout = (req, res, next) => {
