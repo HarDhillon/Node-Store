@@ -50,37 +50,21 @@ exports.getSignup = (req, res, next) => {
 };
 
 exports.postLogin = (req, res, next) => {
-  const email = req.body.email
-  const password = req.body.password
 
-  User.findOne({ email: email })
-    .then(user => {
-      // If user email doesnt exist return to login page
-      if (!user) {
-        // flash sets a temporary key value in our sesssion
-        req.flash('error', 'Invalid Email or Password')
-        return res.redirect('/login')
-      }
-      bcrypt.compare(password, user.password)
-        .then(doMatch => {
-          if (doMatch === true) {
-            req.session.isLoggedIn = true;
-            req.session.user = user;
-            return req.session.save(err => {
-              console.log(err);
-              res.redirect('/');
-            });
-          }
-          // If doMatch is false then passwords dont match:
-          req.flash('error', 'Invalid Email or Password')
-          res.redirect('/login')
-        })
-        .catch(err => {
-          console.log(err)
-          res.redirect('/login')
-        })
-    })
-    .catch(err => console.log(err));
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    return res.status(422)
+      .render('auth/login', {
+        path: '/login',
+        pageTitle: 'Login',
+        isAuthenticated: false,
+        errorMessage: errors.array()[0].msg
+      });
+  }
+  // If no errors isLoggedIn will be saved as true in session
+  // redirect to home page
+  res.redirect('/');
 };
 
 exports.postSignup = (req, res, next) => {
