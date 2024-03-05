@@ -50,7 +50,10 @@ exports.postAddProduct = (req, res, next) => {
             res.redirect('/admin/products')
         })
         .catch(err => {
-            console.log(err)
+            const error = new Error(err)
+            error.httpStatusCode = 500
+            // * Passing next an error object lets it know an error has occured
+            return next(error)
         })
 }
 
@@ -78,7 +81,11 @@ exports.getEditProduct = (req, res, next) => {
                 validationErrors: []
             })
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+            const error = new Error(err)
+            error.httpStatusCode = 500
+            return next(error)
+        })
 
 }
 

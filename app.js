@@ -69,10 +69,15 @@ app.use((req, res, next) => {
     }
     User.findById(req.session.user._id)
         .then(user => {
+            if (!user) {
+                return next()
+            }
             req.user = user
             next()
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+            next(new Error(err))
+        })
 })
 
 // * We can set variables to be used on EVERY view through this middleware
@@ -88,8 +93,15 @@ app.use('/admin', adminRoutes)
 app.use(shopRoutes)
 app.use(authRoutes)
 
+app.get('/500', errorController.get500)
+
 // Any other routes not matching
 app.use(errorController.get404)
+
+// Error handling Middleware
+app.use((error, req, res, next) => {
+    res.redirect('/500')
+})
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(result => {
