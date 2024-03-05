@@ -69,6 +69,7 @@ app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
 
 // Static files
 app.use(express.static(path.join(rootDir, 'public')))
+app.use('/images', express.static(path.join(rootDir, 'images')))
 
 // Session
 app.use(
