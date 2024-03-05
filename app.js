@@ -6,6 +6,7 @@ const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
 const csrf = require('csurf')
 const flash = require('connect-flash')
+const multer = require('multer')
 
 const path = require('path')
 const rootDir = require('./util/path')
@@ -33,12 +34,38 @@ const User = require('./models/user')
 // =========================================================================== // 
 // =========================================================================== // 
 
+// ------------- Start Multer file config -----------------
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images')
+    },
+    filename: (req, file, cb) => {
+        cb(null, new Date().toISOString() + '-' + file.originalname, cb)
+    }
+})
+
+// If callback caleld with true then it is accepted
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/png' ||
+        file.mimetype === 'image/jpg' ||
+        file.mimetype === 'image/jpeg') {
+        cb(null, true)
+    } else {
+        cb(null, false)
+
+    }
+}
+
+// ------------- End Multer file config -----------------
 
 // View Engine
 app.set('view engine', 'ejs');
 
 // bodyParser is now part of express so we can actually just do this
 app.use(express.urlencoded({ extended: false }))
+
+// Multer to handle files
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'))
 
 // Static files
 app.use(express.static(path.join(rootDir, 'public')))
