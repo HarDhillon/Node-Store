@@ -1,4 +1,5 @@
 const Product = require('../models/product')
+const fileHelper = require('../util/file')
 
 const { validationResult } = require('express-validator')
 
@@ -144,6 +145,8 @@ exports.postEditProduct = (req, res, next) => {
             product.description = description
             // Only update imageUrl is new image was provided
             if (image) {
+                // Delete old image
+                fileHelper.deleteFile(product.imageUrl)
                 product.imageUrl = image.path
             }
 
@@ -157,13 +160,25 @@ exports.postEditProduct = (req, res, next) => {
 }
 
 exports.postDeleteProduct = (req, res, next) => {
+
+    // Delete image if we are deleting product
     const prodId = req.body.productId
-    Product.deleteOne({ _id: prodId, userId: req.user._id })
+    Product.findById(prodId)
+        .then(product => {
+            if (!product) {
+                return next(new Error('Product now found'))
+            }
+            fileHelper.deleteFile(product.imageUrl)
+
+            // Once file is delete we can delete from DB
+            return Product.deleteOne({ _id: prodId, userId: req.user._id })
+        })
         .then(result => {
             console.log("Removed product")
             res.redirect('/admin/products')
         })
         .catch(err => console.log(err))
+
 }
 
 exports.getProducts = (req, res, next) => {
