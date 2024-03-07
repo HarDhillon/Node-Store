@@ -128,6 +128,7 @@ app.use(errorController.get404)
 
 // Error handling Middleware
 app.use((error, req, res, next) => {
+    console.log(error)
     res.redirect('/500')
 })
 
