@@ -7,8 +7,11 @@ const MongoDBStore = require('connect-mongodb-session')(session)
 const csrf = require('csurf')
 const flash = require('connect-flash')
 const multer = require('multer')
+const helmet = require('helmet')
+const morgan = require('morgan')
 
 const path = require('path')
+const fs = require('fs')
 const rootDir = require('./util/path')
 
 const app = express()
@@ -115,11 +118,21 @@ app.use((req, res, next) => {
     next()
 })
 
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
+    {
+        flags: 'a'
+    }
+)
+
+app.use(helmet())
+app.use(morgan('combined', { stream: accessLogStream }))
 
 // putting a /argument here will only run if the url is /admin/*something*
 app.use('/admin', adminRoutes)
 app.use(shopRoutes)
 app.use(authRoutes)
+
+
 
 app.get('/500', errorController.get500)
 
