@@ -123,8 +123,9 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
         flags: 'a'
     }
 )
-
-app.use(helmet())
+// ! Helmet will block stripe
+// TODO configure helmet to allow stripe scripts to run
+// app.use(helmet())
 app.use(morgan('combined', { stream: accessLogStream }))
 
 // putting a /argument here will only run if the url is /admin/*something*
